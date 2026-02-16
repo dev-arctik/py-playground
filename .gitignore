@@ -1,0 +1,34 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+
+# Poetry
+# Keep poetry.lock for reproducibility
+
+# macOS
+.DS_Store
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# Claude Code local settings (not project config — keep .claude/ tracked for skills/agents)
+.claude/settings.local.json
+
+# Playwright testing artifacts
+.playwright-mcp/
+
+# Test screenshots (generated during browser testing)
+*-sim.png
+*-sim-*.png
+polygon-frame-*.png
+landing-*.png
+turtle-*.png
+# Exclude root-level test PNGs but keep turtle/*.whl
+!turtle/
+
+# Node (just in case)
+node_modules/

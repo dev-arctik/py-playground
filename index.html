@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Py-Playground</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+    <!-- Grain texture overlay -->
+    <div class="grain" aria-hidden="true"></div>
+
+    <!-- Hero -->
+    <header class="hero">
+        <div class="container">
+            <span class="hero-tag">Python &times; Browser</span>
+            <h1 class="hero-title">Py-Playground</h1>
+            <p class="hero-desc">Turtle graphics and pygame simulations, compiled to WebAssembly and running entirely in your browser &mdash; no installs, no backend.</p>
+            <a href="https://github.com/dev-arctik/py-playground" target="_blank" rel="noopener" class="github-link">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+                View on GitHub
+            </a>
+        </div>
+    </header>
+
+    <main class="container">
+        <!-- Turtle Graphics -->
+        <section class="section" id="turtle">
+            <div class="section-header">
+                <h2 class="section-title">Turtle Graphics</h2>
+                <div class="section-line"></div>
+                <span class="section-badge turtle-badge">7 sims</span>
+            </div>
+            <div class="grid">
+                <a href="turtle/?sim=flower" class="card" style="--i:0">
+                    <span class="card-badge turtle-badge">Turtle</span>
+                    <h3 class="card-title">Flower</h3>
+                    <p class="card-desc">Rotating filled triangles forming a flower pattern</p>
+                </a>
+                <a href="turtle/?sim=polygon" class="card" style="--i:1">
+                    <span class="card-badge turtle-badge">Turtle</span>
+                    <h3 class="card-title">Polygon</h3>
+                    <p class="card-desc">Polygons with increasing sides (3 to 50)</p>
+                </a>
+                <a href="turtle/?sim=curved-graph" class="card" style="--i:2">
+                    <span class="card-badge turtle-badge">Turtle</span>
+                    <h3 class="card-title">Curved Graph</h3>
+                    <p class="card-desc">Curved line art pattern in 4 quadrants</p>
+                </a>
+                <a href="turtle/?sim=chaos-pi-e" class="card" style="--i:3">
+                    <span class="card-badge turtle-badge">Turtle</span>
+                    <h3 class="card-title">Chaos with PI and E</h3>
+                    <p class="card-desc">Spiral pattern using sqrt, pi, and e constants</p>
+                </a>
+                <a href="turtle/?sim=sierpinski-triangle" class="card" style="--i:4">
+                    <span class="card-badge turtle-badge">Turtle</span>
+                    <h3 class="card-title">Sierpinski Triangle</h3>
+                    <p class="card-desc">Chaos game fractal using random midpoint method</p>
+                </a>
+                <a href="turtle/?sim=barnsley-fern" class="card" style="--i:5">
+                    <span class="card-badge turtle-badge">Turtle</span>
+                    <h3 class="card-title">Barnsley Fern</h3>
+                    <p class="card-desc">IFS fractal fern using affine transformations</p>
+                </a>
+                <a href="turtle/?sim=fractal-tree" class="card" style="--i:6">
+                    <span class="card-badge turtle-badge">Turtle</span>
+                    <h3 class="card-title">Fractal Tree</h3>
+                    <p class="card-desc">Recursive tree using turtle cloning and generators</p>
+                </a>
+            </div>
+        </section>
+
+        <!-- Pygame -->
+        <section class="section" id="pygame">
+            <div class="section-header">
+                <h2 class="section-title">Pygame</h2>
+                <div class="section-line"></div>
+                <span class="section-badge pygame-badge">11 sims</span>
+            </div>
+            <div class="grid">
+                <div class="card card--soon" style="--i:0">
+                    <span class="card-badge soon-badge">Coming Soon</span>
+                    <h3 class="card-title">Moving Square</h3>
+                    <p class="card-desc">Square moves with arrow keys</p>
+                </div>
+                <div class="card card--soon" style="--i:1">
+                    <span class="card-badge soon-badge">Coming Soon</span>
+                    <h3 class="card-title">Jumping Square</h3>
+                    <p class="card-desc">Gravity-based jumping with spacebar</p>
+                </div>
+                <div class="card card--soon" style="--i:2">
+                    <span class="card-badge soon-badge">Coming Soon</span>
+                    <h3 class="card-title">Pendulum</h3>
+                    <p class="card-desc">Physics pendulum simulation</p>
+                </div>
+                <div class="card card--soon" style="--i:3">
+                    <span class="card-badge soon-badge">Coming Soon</span>
+                    <h3 class="card-title">Sine Wave</h3>
+                    <p class="card-desc">Animated sine wave visualization</p>
+                </div>
+                <div class="card card--soon" style="--i:4">
+                    <span class="card-badge soon-badge">Coming Soon</span>
+                    <h3 class="card-title">Sierpinski's Triangle</h3>
+                    <p class="card-desc">Pygame chaos game variant</p>
+                </div>
+                <div class="card card--soon" style="--i:5">
+                    <span class="card-badge soon-badge">Coming Soon</span>
+                    <h3 class="card-title">Paint Board</h3>
+                    <p class="card-desc">Keyboard-driven paint tool</p>
+                </div>
+                <div class="card card--soon" style="--i:6">
+                    <span class="card-badge soon-badge">Coming Soon</span>
+                    <h3 class="card-title">Paint Random Screen</h3>
+                    <p class="card-desc">Random color fills on canvas</p>
+                </div>
+                <div class="card card--soon" style="--i:7">
+                    <span class="card-badge soon-badge">Coming Soon</span>
+                    <h3 class="card-title">Paint Random Color</h3>
+                    <p class="card-desc">Random brush colors on canvas</p>
+                </div>
+                <div class="card card--soon" style="--i:8">
+                    <span class="card-badge soon-badge">Coming Soon</span>
+                    <h3 class="card-title">RGB Strips</h3>
+                    <p class="card-desc">Vertical color strips visualization</p>
+                </div>
+                <div class="card card--soon" style="--i:9">
+                    <span class="card-badge soon-badge">Coming Soon</span>
+                    <h3 class="card-title">First Game</h3>
+                    <p class="card-desc">Simple platformer game</p>
+                </div>
+                <div class="card card--soon" style="--i:10">
+                    <span class="card-badge soon-badge">Coming Soon</span>
+                    <h3 class="card-title">Minesweeper</h3>
+                    <p class="card-desc">Classic minesweeper puzzle</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>Built with Pyodide &amp; PyScript</p>
+            <p>Python simulations by <a href="https://github.com/dev-arctik" target="_blank" rel="noopener">dev-arctik</a></p>
+        </div>
+    </footer>
+</body>
+</html>

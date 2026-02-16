@@ -1,0 +1,366 @@
+/* Py-Playground — Landing page styles (dark theme) */
+
+:root {
+    --bg: #08080d;
+    --surface: #111118;
+    --surface-hover: #1a1a24;
+    --border: #1e1e2a;
+    --border-hover: #2a2a3a;
+    --text: #e4e2de;
+    --text-muted: #7a7a8c;
+    --text-dim: #4a4a5c;
+    --turtle: #00d4aa;
+    --turtle-glow: rgba(0, 212, 170, 0.15);
+    --turtle-dim: rgba(0, 212, 170, 0.06);
+    --pygame: #ff6b35;
+    --pygame-glow: rgba(255, 107, 53, 0.15);
+    --pygame-dim: rgba(255, 107, 53, 0.06);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    font-family: 'IBM Plex Mono', monospace;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    line-height: 1.6;
+    /* Subtle dot grid — evokes graph paper / coordinate systems */
+    background-image: radial-gradient(circle, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+    background-size: 28px 28px;
+}
+
+/* Film-grain overlay for texture and depth */
+.grain {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 100;
+    opacity: 0.04;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-repeat: repeat;
+    background-size: 256px 256px;
+}
+
+.container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 28px;
+}
+
+/* ── Hero ── */
+
+.hero {
+    padding: 100px 0 72px;
+    position: relative;
+}
+
+/* Soft teal radial glow behind the title */
+.hero::before {
+    content: '';
+    position: absolute;
+    top: -40px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 700px;
+    height: 450px;
+    background: radial-gradient(ellipse, rgba(0, 212, 170, 0.05) 0%, transparent 70%);
+    pointer-events: none;
+}
+
+.hero-tag {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: var(--turtle);
+    margin-bottom: 20px;
+    opacity: 0;
+    animation: fadeUp 0.6s ease 0.1s forwards;
+}
+
+.hero-title {
+    font-family: 'Instrument Serif', serif;
+    font-size: clamp(3rem, 8vw, 5.5rem);
+    font-weight: 400;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    color: var(--text);
+    margin-bottom: 20px;
+    opacity: 0;
+    animation: fadeUp 0.6s ease 0.2s forwards;
+}
+
+.hero-desc {
+    font-size: 14px;
+    color: var(--text-muted);
+    max-width: 540px;
+    line-height: 1.75;
+    margin-bottom: 32px;
+    opacity: 0;
+    animation: fadeUp 0.6s ease 0.3s forwards;
+}
+
+.github-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-muted);
+    text-decoration: none;
+    padding: 10px 20px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    transition: all 0.25s ease;
+    opacity: 0;
+    animation: fadeUp 0.6s ease 0.4s forwards;
+}
+
+.github-link:hover {
+    color: var(--text);
+    border-color: var(--border-hover);
+    background: var(--surface);
+}
+
+.github-link svg {
+    opacity: 0.6;
+    transition: opacity 0.25s;
+}
+
+.github-link:hover svg {
+    opacity: 1;
+}
+
+/* ── Sections ── */
+
+.section {
+    margin-bottom: 64px;
+}
+
+.section-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 24px;
+    opacity: 0;
+    animation: fadeUp 0.5s ease 0.5s forwards;
+}
+
+#pygame .section-header {
+    animation-delay: 1s;
+}
+
+.section-line {
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+    order: 2;
+}
+
+.section-title {
+    font-family: 'Instrument Serif', serif;
+    font-size: 24px;
+    font-weight: 400;
+    color: var(--text);
+    order: 1;
+    white-space: nowrap;
+}
+
+.section-badge {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    padding: 4px 10px;
+    border-radius: 100px;
+    order: 3;
+    white-space: nowrap;
+}
+
+/* ── Grid ── */
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 14px;
+}
+
+/* ── Cards ── */
+
+.card {
+    display: block;
+    padding: 22px 24px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    text-decoration: none;
+    color: var(--text);
+    position: relative;
+    transition: all 0.3s ease;
+    /* Staggered entrance animation using --i custom property */
+    opacity: 0;
+    animation: cardIn 0.5s ease calc(0.55s + var(--i, 0) * 0.05s) forwards;
+}
+
+#pygame .card {
+    animation: cardIn 0.5s ease calc(1.05s + var(--i, 0) * 0.05s) forwards;
+}
+
+/* Arrow indicator — slides in on hover for clickable cards */
+.card::after {
+    content: '\2192';
+    position: absolute;
+    top: 22px;
+    right: 24px;
+    font-size: 16px;
+    color: var(--text-dim);
+    transition: all 0.3s;
+    opacity: 0;
+    transform: translateX(-4px);
+}
+
+a.card:hover {
+    transform: translateY(-3px);
+    background: var(--surface-hover);
+}
+
+a.card:hover::after {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+/* Turtle cards — teal glow on hover */
+#turtle a.card:hover {
+    border-color: rgba(0, 212, 170, 0.3);
+    box-shadow: 0 4px 24px var(--turtle-glow), 0 0 0 1px rgba(0, 212, 170, 0.08);
+}
+
+#turtle a.card:hover::after {
+    color: var(--turtle);
+}
+
+/* Card badge */
+.card-badge {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border-radius: 4px;
+    margin-bottom: 14px;
+}
+
+.turtle-badge {
+    color: var(--turtle);
+    background: var(--turtle-dim);
+}
+
+.pygame-badge {
+    color: var(--pygame);
+    background: var(--pygame-dim);
+}
+
+.soon-badge {
+    color: var(--text-dim);
+    background: rgba(74, 74, 92, 0.2);
+}
+
+/* Card content */
+.card-title {
+    font-family: 'Instrument Serif', serif;
+    font-size: 20px;
+    font-weight: 400;
+    margin-bottom: 6px;
+}
+
+.card-desc {
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.5;
+}
+
+/* Coming-soon cards — dimmed with dashed border */
+.card--soon {
+    cursor: default;
+    border-style: dashed;
+}
+
+.card--soon::after {
+    display: none;
+}
+
+.card--soon .card-title,
+.card--soon .card-desc {
+    opacity: 0.45;
+}
+
+.card--soon:hover {
+    transform: none;
+    background: var(--surface);
+    border-color: var(--border);
+    box-shadow: none;
+}
+
+/* ── Footer ── */
+
+.footer {
+    padding: 36px 0;
+    border-top: 1px solid var(--border);
+    margin-top: 20px;
+}
+
+.footer .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.footer p {
+    font-size: 12px;
+    color: var(--text-dim);
+}
+
+.footer a {
+    color: var(--text-muted);
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.footer a:hover {
+    color: var(--turtle);
+}
+
+/* ── Animations ── */
+
+@keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes cardIn {
+    from { opacity: 0; transform: translateY(20px) scale(0.98); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* ── Responsive ── */
+
+@media (max-width: 768px) {
+    .hero { padding: 60px 0 48px; }
+    .grid { grid-template-columns: 1fr; }
+    .section-header { flex-wrap: wrap; }
+    .section-line { min-width: 40px; }
+    .footer .container {
+        flex-direction: column;
+        gap: 8px;
+        text-align: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .container { padding: 0 16px; }
+    .hero-title { font-size: 2.5rem; }
+    .card { padding: 18px 20px; }
+}

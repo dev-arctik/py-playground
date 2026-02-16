@@ -1,0 +1,14 @@
+[tool.poetry]
+name = "py-playground"
+version = "0.1.0"
+description = "Python turtle and pygame simulations in the browser"
+package-mode = false
+
+[tool.poetry.dependencies]
+python = ">=3.12"
+pygame-ce = ">=2.4,<3"  # Should approximate Pyodide's bundled pygame-ce version
+numpy = "*"
+
+[build-system]
+requires = ["poetry-core>=2.0"]
+build-backend = "poetry.core.masonry.api"

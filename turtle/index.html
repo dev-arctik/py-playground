@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loading... | Py-Playground</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js"></script>
+    <script>
+        // Sim metadata — title and description for each turtle simulation
+        const SIMS = {
+            'flower':              { title: 'Flower',              desc: 'Rotating filled triangles forming a flower pattern' },
+            'polygon':             { title: 'Polygon',             desc: 'Polygons with increasing sides (3 to 50)' },
+            'curved-graph':        { title: 'Curved Graph',        desc: 'Curved line art pattern in 4 quadrants' },
+            'chaos-pi-e':          { title: 'Chaos with PI and E', desc: 'Spiral pattern using sqrt, pi, and e constants' },
+            'sierpinski-triangle': { title: 'Sierpinski Triangle', desc: 'Chaos game fractal using random midpoint method' },
+            'barnsley-fern':       { title: 'Barnsley Fern',       desc: 'IFS fractal fern using affine transformations' },
+            'fractal-tree':        { title: 'Fractal Tree',        desc: 'Recursive tree using turtle cloning and generators' },
+        };
+
+        const sim = new URLSearchParams(location.search).get('sim');
+        const meta = SIMS[sim];
+        if (meta) {
+            document.title = `${meta.title} | Py-Playground`;
+        }
+    </script>
+    <style>
+        :root {
+            --bg: #08080d;
+            --surface: #111118;
+            --surface-hover: #1a1a24;
+            --border: #1e1e2a;
+            --border-hover: #2a2a3a;
+            --text: #e4e2de;
+            --text-muted: #7a7a8c;
+            --text-dim: #4a4a5c;
+            --accent: #00d4aa;
+            --accent-dim: rgba(0, 212, 170, 0.06);
+            --accent-glow: rgba(0, 212, 170, 0.15);
+            --error: #ff6b6b;
+            --error-bg: rgba(255, 107, 107, 0.08);
+            --error-border: rgba(255, 107, 107, 0.2);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'IBM Plex Mono', monospace;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            line-height: 1.6;
+            background-image: radial-gradient(circle, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+            background-size: 28px 28px;
+        }
+
+        /* Film-grain overlay */
+        .grain {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 100;
+            opacity: 0.04;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+            background-repeat: repeat;
+            background-size: 256px 256px;
+        }
+
+        /* Top navigation bar */
+        .nav {
+            padding: 16px 32px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .nav-brand {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 13px;
+            font-weight: 500;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .nav-brand:hover { color: var(--accent); }
+
+        .nav-badge {
+            font-size: 11px;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            padding: 4px 10px;
+            border-radius: 100px;
+            background: var(--accent-dim);
+            color: var(--accent);
+        }
+
+        /* Main content area */
+        .main {
+            max-width: 920px;
+            margin: 0 auto;
+            padding: 48px 32px 80px;
+        }
+
+        /* Sim header */
+        .sim-header {
+            margin-bottom: 32px;
+            opacity: 0;
+            transform: translateY(12px);
+            animation: fadeUp 0.5s ease forwards;
+        }
+
+        .sim-title {
+            font-family: 'Instrument Serif', serif;
+            font-size: clamp(2rem, 5vw, 3rem);
+            font-weight: 400;
+            color: var(--text);
+            line-height: 1.2;
+            margin-bottom: 8px;
+        }
+
+        .sim-desc {
+            font-size: 14px;
+            color: var(--text-muted);
+            font-style: italic;
+            max-width: 520px;
+        }
+
+        /* SVG canvas frame — white lightbox on dark background */
+        .canvas-frame {
+            background: #ffffff;
+            border: 1px solid var(--border-hover);
+            border-radius: 12px;
+            overflow: hidden;
+            min-height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transform: translateY(16px);
+            animation: fadeUp 0.5s ease 0.15s forwards;
+            transition: box-shadow 0.3s ease;
+        }
+
+        .canvas-frame:hover {
+            box-shadow: 0 4px 32px rgba(0, 212, 170, 0.06);
+        }
+
+        .canvas-frame svg {
+            display: block;
+            max-width: 100%;
+            height: auto;
+        }
+
+        /* Loading state — dark variant inside the white frame */
+        .loading-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            padding: 60px 20px;
+        }
+
+        .spinner {
+            width: 36px;
+            height: 36px;
+            border: 3px solid #e0e0e0;
+            border-top-color: #00d4aa;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        .loading-text {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 14px;
+            color: #6b6b80;
+            letter-spacing: 0.3px;
+        }
+
+        .loading-subtext {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 12px;
+            color: #9a9ab0;
+            opacity: 0.6;
+        }
+
+        /* Error state */
+        .error-state {
+            display: none;
+            padding: 16px 20px;
+            background: var(--error-bg);
+            border: 1px solid var(--error-border);
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        .error-state code {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 13px;
+            color: var(--error);
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        /* Sim listing (fallback when no ?sim= param) */
+        .sim-listing {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 14px;
+            margin-top: 24px;
+        }
+
+        .sim-card {
+            display: block;
+            padding: 20px 24px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            text-decoration: none;
+            color: var(--text);
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        /* Arrow indicator on hover */
+        .sim-card::after {
+            content: '\2192';
+            position: absolute;
+            top: 20px;
+            right: 24px;
+            font-size: 16px;
+            color: var(--text-dim);
+            transition: all 0.3s;
+            opacity: 0;
+            transform: translateX(-4px);
+        }
+
+        .sim-card:hover {
+            border-color: rgba(0, 212, 170, 0.3);
+            box-shadow: 0 4px 24px var(--accent-glow), 0 0 0 1px rgba(0, 212, 170, 0.08);
+            background: var(--surface-hover);
+            transform: translateY(-3px);
+        }
+
+        .sim-card:hover::after {
+            opacity: 1;
+            transform: translateX(0);
+            color: var(--accent);
+        }
+
+        .sim-card-title {
+            font-family: 'Instrument Serif', serif;
+            font-size: 20px;
+            margin-bottom: 6px;
+        }
+
+        .sim-card-desc {
+            font-size: 13px;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        /* Footer area */
+        .footer {
+            margin-top: 32px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            opacity: 0;
+            animation: fadeUp 0.5s ease 0.3s forwards;
+        }
+
+        .back-link {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-muted);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: color 0.2s;
+        }
+
+        .back-link:hover { color: var(--accent); }
+
+        .back-link svg {
+            width: 16px;
+            height: 16px;
+            transition: transform 0.2s;
+        }
+
+        .back-link:hover svg { transform: translateX(-3px); }
+
+        .source-link {
+            font-size: 12px;
+            color: var(--text-dim);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .source-link:hover { color: var(--text-muted); }
+
+        /* Animations */
+        @keyframes fadeUp {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Responsive */
+        @media (max-width: 640px) {
+            .nav { padding: 12px 16px; }
+            .main { padding: 28px 16px 60px; }
+            .sim-title { font-size: 1.75rem; }
+            .canvas-frame { border-radius: 8px; }
+            .sim-listing { grid-template-columns: 1fr; }
+            .footer { flex-direction: column; gap: 12px; align-items: flex-start; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Grain texture overlay -->
+    <div class="grain" aria-hidden="true"></div>
+
+    <nav class="nav">
+        <a href="../index.html" class="nav-brand">Py-Playground</a>
+        <span class="nav-badge">Turtle</span>
+    </nav>
+
+    <main class="main">
+        <div class="sim-header">
+            <h1 id="sim-title" class="sim-title">Loading...</h1>
+            <p id="sim-desc" class="sim-desc"></p>
+        </div>
+
+        <div id="canvas-frame" class="canvas-frame">
+            <div id="loading" class="loading-state">
+                <div class="spinner"></div>
+                <span class="loading-text">Loading Python runtime...</span>
+                <span class="loading-subtext">Downloading Pyodide (~15 MB on first visit)</span>
+            </div>
+        </div>
+
+        <div id="visual" style="display:none;"></div>
+        <div id="error" class="error-state"></div>
+
+        <div class="footer">
+            <a href="../index.html" class="back-link">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+                Back to Gallery
+            </a>
+            <a href="https://github.com/dev-arctik/Python-Turtle" target="_blank" rel="noopener" class="source-link">View original source</a>
+        </div>
+    </main>
+
+    <script>
+        const SVG_NS = 'http://www.w3.org/2000/svg';
+        // SVG tags that must be created with the SVG namespace
+        const SVG_TAGS = new Set([
+            'svg', 'g', 'line', 'circle', 'rect', 'polygon', 'polyline',
+            'path', 'text', 'tspan', 'animate', 'animateTransform', 'use',
+            'defs', 'clipPath', 'image', 'ellipse',
+        ]);
+
+        // Build a DOM element from the SVG dict returned by RPi turtle lib
+        function elementFromProps(map) {
+            const tag = map.get("tag");
+            if (!tag) return document.createTextNode(map.get("text"));
+
+            // SVG elements need createElementNS to render correctly
+            const node = SVG_TAGS.has(tag)
+                ? document.createElementNS(SVG_NS, tag)
+                : document.createElement(tag);
+            for (const [key, value] of map.get("props")) node.setAttribute(key, value);
+            for (const childProps of map.get("children")) node.appendChild(elementFromProps(childProps));
+            return node;
+        }
+
+        if (meta) {
+            document.getElementById('sim-title').textContent = meta.title;
+            document.getElementById('sim-desc').textContent = meta.desc;
+
+            (async () => {
+                try {
+                    // Load Pyodide runtime
+                    const pyodide = await loadPyodide();
+
+                    // Register fake basthon module (required by RPi turtle lib)
+                    const visual = document.getElementById('visual');
+                    const frame = document.getElementById('canvas-frame');
+                    pyodide.registerJsModule("basthon", {
+                        kernel: {
+                            display_event: (e) => {
+                                // Safe DOM construction — no innerHTML
+                                const svgEl = elementFromProps(e.toJs().get("content"));
+                                frame.replaceChildren(svgEl);
+                            },
+                            locals: () => pyodide.runPython("globals()"),
+                        },
+                    });
+
+                    // Load RPi turtle wheel (SVG-based turtle for Pyodide)
+                    await pyodide.loadPackage("./turtle-0.0.1-py3-none-any.whl");
+
+                    document.querySelector('.loading-text').textContent = 'Running simulation...';
+                    document.querySelector('.loading-subtext').textContent = 'Drawing turtle graphics';
+
+                    // Disable SVG SMIL animations — render static coordinate snapshots
+                    pyodide.runPython("import turtle; turtle.Screen().animation('off')");
+
+                    // Monkey-patch asyncio.sleep to render progressive frames
+                    pyodide.runPython(`
+import asyncio
+import turtle
+import basthon
+
+_orig_sleep = asyncio.sleep
+
+async def _render_sleep(delay):
+    svg_dict = turtle.Screen().show_scene()
+    basthon.kernel.display_event({"display_type": "turtle", "content": svg_dict})
+    await _orig_sleep(0.05)
+
+asyncio.sleep = _render_sleep
+                    `);
+
+                    // Fetch the sim's Python code
+                    const code = await fetch(`${sim}/main.py`).then(r => r.text());
+
+                    // Run the code — defines main() but doesn't call it in browser
+                    // (the try/except detects the running loop and skips execution)
+                    await pyodide.runPythonAsync(code);
+
+                    // Call main() and wait for it to complete
+                    await pyodide.runPythonAsync("await main()");
+
+                    // Render the turtle scene as SVG
+                    pyodide.runPython(`
+import turtle
+import basthon
+
+svg_dict = turtle.Screen().show_scene()
+basthon.kernel.display_event({ "display_type": "turtle", "content": svg_dict })
+                    `);
+
+                } catch (err) {
+                    document.getElementById('loading').style.display = 'none';
+                    const errorEl = document.getElementById('error');
+                    errorEl.style.display = 'block';
+                    errorEl.textContent = '';
+                    const code = document.createElement('code');
+                    code.textContent = err.message;
+                    errorEl.appendChild(code);
+                    console.error(err);
+                }
+            })();
+        } else {
+            // No sim selected — show listing of all available simulations
+            document.getElementById('sim-title').textContent = 'Turtle Simulations';
+            document.getElementById('sim-desc').textContent = 'Choose a simulation to explore';
+            document.getElementById('loading').style.display = 'none';
+
+            const frame = document.getElementById('canvas-frame');
+            frame.style.background = 'transparent';
+            frame.style.border = 'none';
+            frame.style.boxShadow = 'none';
+            frame.style.minHeight = 'auto';
+            frame.style.display = 'block';
+
+            const listing = document.createElement('div');
+            listing.className = 'sim-listing';
+            Object.entries(SIMS).forEach(([k, v], i) => {
+                const a = document.createElement('a');
+                a.href = `?sim=${k}`;
+                a.className = 'sim-card';
+                a.style.setProperty('--i', i);
+
+                const title = document.createElement('div');
+                title.className = 'sim-card-title';
+                title.textContent = v.title;
+
+                const desc = document.createElement('div');
+                desc.className = 'sim-card-desc';
+                desc.textContent = v.desc;
+
+                a.appendChild(title);
+                a.appendChild(desc);
+                listing.appendChild(a);
+            });
+            frame.appendChild(listing);
+        }
+    </script>
+</body>
+</html>
