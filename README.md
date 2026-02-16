@@ -25,21 +25,50 @@ These repos contained the original Python source code. Each has been ported to r
 | `dev-arctik/Python-Game` | Pygame | First Game |
 | `dev-arctik/python-minesweeper` | Pygame | Minesweeper |
 
-## How it works
+## How does Python run in a browser?
 
-### Turtle simulations
+Browsers only execute JavaScript natively. To run Python, we need a bridge — that's where **Pyodide** and **PyScript** come in.
 
-Turtle graphics can't run in the browser natively (no tkinter in WebAssembly). The solution:
+### Pyodide — CPython compiled to WebAssembly
 
-1. **Pyodide** (v0.26.4) — CPython compiled to WebAssembly
-2. **RPi Foundation's turtle library** — a drop-in SVG-based turtle module designed for Pyodide
-3. A shared player page (`turtle/index.html`) loads Pyodide, runs the Python simulation, and renders the result as an SVG
+[Pyodide](https://pyodide.org/) takes the entire CPython interpreter (the same one you run with `python3` on your machine) and compiles it to [WebAssembly (WASM)](https://webassembly.org/) — a binary instruction format that browsers can execute at near-native speed.
 
-Each simulation draws progressively — you can watch the turtle animate, just like running it locally.
+When you open a simulation on this site, here's what happens:
 
-### Pygame simulations (coming soon)
+1. The browser downloads the Pyodide runtime (~15 MB on first visit, cached after that)
+2. Pyodide boots a full CPython interpreter inside the browser tab
+3. Your Python code runs in that interpreter — `import math`, `for` loops, `async/await` — all real Python
+4. The results (SVG graphics, canvas pixels) get passed back to JavaScript for rendering
 
-Pygame sims will use **PyScript** with `<script type="py-game">` to run pygame-ce via Pyodide with a `<canvas>` element.
+Pyodide supports most of the Python standard library and can install pure-Python packages. However, modules that depend on system libraries (like `tkinter` for GUI windows) are stripped out since there's no operating system underneath — just the browser sandbox.
+
+### PyScript — the HTML-friendly wrapper
+
+[PyScript](https://pyscript.net/) is built on top of Pyodide and makes it easier to embed Python directly in HTML pages. Instead of writing JavaScript glue code to load Pyodide, you just write:
+
+```html
+<script type="py">
+    import math
+    print(f"Pi is {math.pi}")
+</script>
+```
+
+PyScript handles loading Pyodide, managing packages, and connecting Python to the DOM. It also provides a special `<script type="py-game">` tag that sets up a pygame-compatible canvas automatically — which is how the pygame simulations will work.
+
+### How this project uses them
+
+**Turtle simulations** use Pyodide directly (not PyScript) because the standard `turtle` module is removed from Pyodide (it depends on tkinter, which needs a display server). Instead, we use the [RPi Foundation's turtle library](https://github.com/RaspberryPiFoundation/turtle) — a drop-in replacement that renders to SVG instead of a tkinter window.
+
+The flow for a turtle simulation:
+
+```
+Browser loads Pyodide → loads RPi turtle wheel → runs your Python code
+→ turtle draws to an internal SVG → SVG gets inserted into the page
+```
+
+Each simulation draws progressively — you can watch the turtle animate line by line, just like running it locally.
+
+**Pygame simulations** (coming soon) will use PyScript with `<script type="py-game">` to run [pygame-ce](https://pyga.me/) via Pyodide, rendering to an HTML `<canvas>` element.
 
 ## Running locally
 
