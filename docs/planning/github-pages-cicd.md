@@ -2,6 +2,7 @@
 
 **Last Updated:** 2026-02-17
 **Status:** Complete
+**Live URL:** https://dev-arctik.github.io/py-playground/
 **Environment(s):** Production (GitHub Pages)
 **Source Reference:** [dev-arctik/digital-bouquet](https://github.com/dev-arctik/digital-bouquet) workflow
 
@@ -79,17 +80,22 @@ mkdir -p .github/workflows
 
 Create `.github/workflows/deploy.yml` with the following content:
 
-#### For Static Sites (No Build Step)
+#### For Static Python Sites (py-playground style)
+
+This is the actual workflow used by py-playground — `.github/workflows/deploy.yml`:
 
 ```yaml
-# Simple deployment for static HTML/CSS/JS sites (py-playground style)
-name: Deploy to GitHub Pages
+# CI/CD pipeline: validate Python sims on PRs, full deploy on push to main.
+# Uses a 3-job structure: check → build → deploy.
+name: CI / Deploy
 
 on:
   push:
     branches: [main]
   pull_request:
     branches: [main]
+
+  # allow manual trigger from Actions tab
   workflow_dispatch:
 
 permissions:
@@ -97,25 +103,67 @@ permissions:
   pages: write
   id-token: write
 
-# Prevent concurrent deployments
+# only one deployment at a time — cancel in-progress if a new push arrives
 concurrency:
   group: pages
   cancel-in-progress: true
 
 jobs:
-  # ── Check: validate content (optional but recommended) ──────────────
+  # ── Check: validate Python scripts and project structure ─────────────
   check:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Validate HTML (example)
-        run: |
-          echo "Add validation commands here if needed"
-          # Example: npm run lint, python -m html5validator, etc.
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
 
-  # ── Build: prepare static files for deployment ──────────────────────
+      # syntax-check every .py file in turtle/ and pygame/
+      - name: Check Python syntax
+        run: |
+          echo "Checking Python syntax..."
+          errors=0
+          while IFS= read -r f; do
+            if ! python -m py_compile "$f"; then
+              errors=$((errors + 1))
+            fi
+          done < <(find turtle pygame -name '*.py')
+          if [ "$errors" -gt 0 ]; then
+            echo "::error::$errors Python file(s) have syntax errors"
+            exit 1
+          fi
+          echo "All Python files pass syntax check"
+
+      # every sim directory should have a main.py
+      - name: Verify sim structure
+        run: |
+          echo "Verifying each sim folder has main.py..."
+          errors=0
+          for dir in turtle/*/; do
+            # skip non-directories and the .whl file
+            [ -d "$dir" ] || continue
+            if [ ! -f "${dir}main.py" ]; then
+              echo "::error::Missing main.py in $dir"
+              errors=$((errors + 1))
+            fi
+          done
+          for dir in pygame/*/; do
+            [ -d "$dir" ] || continue
+            if [ ! -f "${dir}main.py" ]; then
+              echo "::error::Missing main.py in $dir"
+              errors=$((errors + 1))
+            fi
+          done
+          if [ "$errors" -gt 0 ]; then
+            echo "::error::$errors sim folder(s) missing main.py"
+            exit 1
+          fi
+          echo "All sim folders have main.py"
+
+  # ── Build: prepare static files for deployment (gated by check) ──────
   build:
     needs: check
     if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
@@ -127,12 +175,13 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v4
 
+      # no build step — static HTML/CSS/JS site with Pyodide and PyScript
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: .  # Deploy entire repo root (for py-playground)
+          path: .
 
-  # ── Deploy: publish to GitHub Pages ──────────────────────────────────
+  # ── Deploy: publish to GitHub Pages (gated by build) ─────────────────
   deploy:
     needs: build
     if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
@@ -493,54 +542,35 @@ Access it in the Actions tab after deployment completes.
 
 For the py-playground project:
 
-1. **No build step required** — the site is pure HTML/CSS/JS with PyScript
-2. **Deploy entire repo root** — use `path: .` in upload-pages-artifact
-3. **Optional check job** — can validate HTML syntax or check for broken links
-4. **Base path:** Not required (unless you change to a build tool later)
+1. **No build step required** — the site is pure HTML/CSS/JS with Pyodide (turtle) and PyScript (pygame)
+2. **Deploy entire repo root** — `path: .` in `upload-pages-artifact` serves all HTML, CSS, JS, `.py`, and `.whl` files directly
+3. **Check job validates Python** — uses `python -m py_compile` on every `.py` file in `turtle/` and `pygame/`, and verifies every sim directory contains a `main.py`
+4. **check runs on PRs** — PRs are validated but never deployed; `build` and `deploy` are gated to `push` and `workflow_dispatch` only
+5. **Pages enabled via API** — GitHub Pages was configured with `build_type=workflow` (not "Deploy from a branch") so that the Actions workflow controls all deployments
+6. **Live URL:** `https://dev-arctik.github.io/py-playground/`
 
-**Recommended workflow for py-playground:**
+### Check Job Details
 
-```yaml
-name: Deploy to GitHub Pages
+The `check` job performs two validations:
 
-on:
-  push:
-    branches: [main]
-  workflow_dispatch:
+| Step | Tool | What it checks |
+|------|------|----------------|
+| Check Python syntax | `python -m py_compile` | Every `.py` in `turtle/` and `pygame/` — fails if any file has a syntax error |
+| Verify sim structure | bash `for dir` loop | Every `turtle/*/` and `pygame/*/` subdirectory must contain a `main.py` |
 
-permissions:
-  contents: read
-  pages: write
-  id-token: write
+Python version used: **3.12** (via `actions/setup-python@v5`).
 
-concurrency:
-  group: pages
-  cancel-in-progress: true
+### Workflow Trigger Matrix
 
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+| Event | check | build | deploy |
+|-------|-------|-------|--------|
+| Push to `main` | Yes | Yes (needs check) | Yes (needs build) |
+| Pull request to `main` | Yes | No | No |
+| `workflow_dispatch` | Yes | Yes (needs check) | Yes (needs build) |
 
-      - name: Setup Pages
-        uses: actions/configure-pages@v4
+### Actual Workflow File
 
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: .
-
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
-```
-
-This is the simplest possible workflow — one job, no build step, just deploy the entire repository.
+The deployed workflow is at `.github/workflows/deploy.yml` — see the "For Static Python Sites" template above for the exact content. The workflow name is `CI / Deploy`.
 
 ## References
 
@@ -558,3 +588,4 @@ This is the simplest possible workflow — one job, no build step, just deploy t
 | Date | Change |
 |------|--------|
 | 2026-02-17 | Initial version — adapted from digital-bouquet workflow |
+| 2026-02-17 | Updated to reflect actual 3-job pipeline: check (Python syntax + sim structure validation) → build → deploy; added PR trigger, workflow_dispatch, trigger matrix, check job detail table; replaced single-job "recommended workflow" with real deploy.yml content; added live URL |
