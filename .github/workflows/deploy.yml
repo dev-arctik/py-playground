@@ -1,10 +1,14 @@
-# Deploy static site to GitHub Pages on push to main.
-# No build step — pure HTML/CSS/JS with Pyodide and PyScript.
-name: Deploy to GitHub Pages
+# CI/CD pipeline: validate Python sims on PRs, full deploy on push to main.
+# Uses a 3-job structure: check → build → deploy.
+name: CI / Deploy
 
 on:
   push:
     branches: [main]
+  pull_request:
+    branches: [main]
+
+  # allow manual trigger from Actions tab
   workflow_dispatch:
 
 permissions:
@@ -12,16 +16,71 @@ permissions:
   pages: write
   id-token: write
 
+# only one deployment at a time — cancel in-progress if a new push arrives
 concurrency:
   group: pages
   cancel-in-progress: true
 
 jobs:
-  deploy:
+  # ── Check: validate Python scripts and project structure ─────────────
+  check:
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      # syntax-check every .py file in turtle/ and pygame/
+      - name: Check Python syntax
+        run: |
+          echo "Checking Python syntax..."
+          errors=0
+          while IFS= read -r f; do
+            if ! python -m py_compile "$f"; then
+              errors=$((errors + 1))
+            fi
+          done < <(find turtle pygame -name '*.py')
+          if [ "$errors" -gt 0 ]; then
+            echo "::error::$errors Python file(s) have syntax errors"
+            exit 1
+          fi
+          echo "All Python files pass syntax check"
+
+      # every sim directory should have a main.py
+      - name: Verify sim structure
+        run: |
+          echo "Verifying each sim folder has main.py..."
+          errors=0
+          for dir in turtle/*/; do
+            # skip non-directories and the .whl file
+            [ -d "$dir" ] || continue
+            if [ ! -f "${dir}main.py" ]; then
+              echo "::error::Missing main.py in $dir"
+              errors=$((errors + 1))
+            fi
+          done
+          for dir in pygame/*/; do
+            [ -d "$dir" ] || continue
+            if [ ! -f "${dir}main.py" ]; then
+              echo "::error::Missing main.py in $dir"
+              errors=$((errors + 1))
+            fi
+          done
+          if [ "$errors" -gt 0 ]; then
+            echo "::error::$errors sim folder(s) missing main.py"
+            exit 1
+          fi
+          echo "All sim folders have main.py"
+
+  # ── Build: prepare static files for deployment (gated by check) ──────
+  build:
+    needs: check
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -29,11 +88,21 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v4
 
+      # no build step — static HTML/CSS/JS site with Pyodide and PyScript
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: .
 
+  # ── Deploy: publish to GitHub Pages (gated by build) ─────────────────
+  deploy:
+    needs: build
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
