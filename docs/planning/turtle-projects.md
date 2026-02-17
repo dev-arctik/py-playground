@@ -1,10 +1,25 @@
 # Feature: Python Turtle Projects — Browser Conversion
 
-**Version:** v1.0
+**Version:** v1.1
 **Status:** Complete
 **Author:** global-doc-master
 **Created:** 2026-02-16
 **Last Modified:** 2026-02-17
+
+> **Post-completion note (2026-02-17):** All 7 turtle simulations are live. The
+> implementation diverged from the original plan in important ways:
+> - **Runtime:** Uses Pyodide v0.26.4 directly (NOT PyScript). Loads the RPi
+>   Foundation SVG turtle wheel for rendering to SVG (not HTML5 canvas).
+> - **Rendering:** Progressive SVG animation via monkey-patched `asyncio.sleep`
+>   that calls `turtle.show_scene()` + a fake `basthon` JS module to bridge
+>   Python SVG dicts to the DOM.
+> - **Execution:** The player page fetches `<sim>/main.py`, runs it with
+>   `pyodide.runPythonAsync()`, then explicitly calls `await main()`. The
+>   dual-mode try/except pattern in each `main.py` still works as planned.
+> - The architecture diagram, shared player template, and integration points
+>   below reflect the **pre-implementation plan** (PyScript-based), not the
+>   actual implementation. See `docs/feature-flow/turtle-simulations-flow.md`
+>   for the accurate technical flow.
 
 ---
 
@@ -686,8 +701,9 @@ except RuntimeError:
 ## References
 
 - Original source repository: `https://github.com/dev-arctik/Python-Turtle`
-- PyScript documentation: `https://docs.pyscript.net/`
-- PyScript CDN (stable): `https://pyscript.net/releases/2024.1.1/core.js`
+- **Pyodide CDN (actual runtime used):** `https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js`
+- **RPi Foundation turtle library:** `https://github.com/RaspberryPiFoundation/turtle` (SVG-based, loaded as `turtle-0.0.1-py3-none-any.whl`)
 - Pyodide documentation: `https://pyodide.org/en/stable/`
 - Python turtle module docs: `https://docs.python.org/3/library/turtle.html`
+- Feature flow doc (accurate technical details): `../feature-flow/turtle-simulations-flow.md`
 - Project CLAUDE.md: `../../CLAUDE.md`

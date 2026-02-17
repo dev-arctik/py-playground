@@ -45,9 +45,11 @@ py-playground/                     # Target structure (to be created during impl
 │       ├── pyscript.toml
 │       └── assets/
 ├── docs/
-│   └── planning/
-│       ├── 2026-02-16-turtle-projects.md
-│       └── 2026-02-16-pygame-projects.md
+│   ├── planning/
+│   │   ├── turtle-projects.md
+│   │   └── pygame-projects.md
+│   └── feature-flow/
+│       └── turtle-simulations-flow.md
 └── CLAUDE.md
 ```
 
@@ -154,8 +156,8 @@ All original Python code lives in `github.com/dev-arctik/` repos:
 **If any sim breaks:** revert the upgrade or fix the compatibility issue first
 
 ## Planning Docs
-- **Turtle plan:** `docs/planning/2026-02-16-turtle-projects.md` — 7 turtle conversions with per-project conversion notes
-- **Pygame plan:** `docs/planning/2026-02-16-pygame-projects.md` — 11 pygame conversions (9 simple + 2 complex)
+- **Turtle plan:** `docs/planning/turtle-projects.md` — 7 turtle conversions with per-project conversion notes
+- **Pygame plan:** `docs/planning/pygame-projects.md` — 11 pygame conversions (9 simple + 2 complex)
 
 ## Important Rules
 - Read the relevant planning doc before starting any conversion (turtle or pygame)

@@ -1,10 +1,24 @@
 # Feature: Pygame Projects — Browser Conversion
 
-**Version:** v1.0
-**Status:** Approved
+**Version:** v1.1
+**Status:** In Progress (Phase 1-2 Complete, Phase 3 Deferred)
 **Author:** global-doc-master
 **Created:** 2026-02-16
-**Last Modified:** 2026-02-16
+**Last Modified:** 2026-02-17
+
+> **Progress update (2026-02-17):** 9 of 11 pygame simulations are live.
+> - **Phase 1 (5 sims) -- DONE:** Moving Square, Jumping Square, Pendulum,
+>   Sine Wave, Sierpinski Triangle. All converted and deployed.
+> - **Phase 2 (4 sims) -- DONE:** Paint Board, Paint Random Screen, Paint
+>   Random Color, RGB Strips. All converted and deployed.
+> - **Phase 3 (2 sims) -- DEFERRED:** First Game and Minesweeper are marked
+>   "Coming Soon" on the landing page. These require asset bundling,
+>   `pyscript.toml` configs, and significant conversion effort.
+> - **CDN version:** The actual implementation uses PyScript **2025.3.1**
+>   (not 2024.1.1 as originally planned). All CDN URLs in templates below
+>   reference the pre-implementation plan version.
+> - The shared player page (`pygame/index.html`) and all 9 `main.py` files
+>   are committed and working in the browser.
 
 ---
 
@@ -1006,8 +1020,9 @@ packages = ["numpy"]  # Only if needed (minesweeper)
 
 - Original source repositories: `https://github.com/dev-arctik/<repo-name>` (9 repos listed in inventory)
 - PyScript documentation: `https://docs.pyscript.net/`
-- PyScript pygame-ce guide: `https://docs.pyscript.net/2025.2.1/user-guide/pygame-ce/` (docs page is for a newer PyScript version; guide content applies to 2024.1.1 as well)
-- PyScript CDN (stable): `https://pyscript.net/releases/2024.1.1/core.js`
+- PyScript pygame-ce guide: `https://docs.pyscript.net/2025.2.1/user-guide/pygame-ce/`
+- **PyScript CDN (actual version used):** `https://pyscript.net/releases/2025.3.1/core.js`
+- PyScript CDN (originally planned): `https://pyscript.net/releases/2024.1.1/core.js`
 - Pyodide documentation: `https://pyodide.org/en/stable/`
 - pygame-ce documentation: `https://pyga.me/docs/`
 - numpy in Pyodide: `https://pyodide.org/en/stable/usage/packages-in-pyodide.html`
