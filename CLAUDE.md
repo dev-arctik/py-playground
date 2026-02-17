@@ -66,7 +66,7 @@ py-playground/                     # Target structure (to be created during impl
 - `tracer()`, `begin_fill()`/`end_fill()` are not fully supported — sims render as line drawings
 
 **Pygame player** (`pygame/index.html`):
-- Uses **PyScript CDN** (2024.1.1 stable): `https://pyscript.net/releases/2024.1.1/core.js`
+- Uses **PyScript CDN** (2025.3.1): `https://pyscript.net/releases/2025.3.1/core.js`
 - Injects `<script type="py-game" src="<sim>/main.py">` with `<canvas id="canvas">`
 
 ### Dual-Mode Python Files
@@ -147,7 +147,7 @@ All original Python code lives in `github.com/dev-arctik/` repos:
 - Update in `turtle/index.html` — test all 7 turtle sims before committing
 
 **PyScript (pygame player):**
-- CDN: `https://pyscript.net/releases/2024.1.1/core.js`
+- CDN: `https://pyscript.net/releases/2025.3.1/core.js`
 - Update in `pygame/index.html` — test all 11 pygame sims before committing
 
 **When to upgrade:** critical security fixes, compatibility issues, or a new release unblocks "coming soon" projects
