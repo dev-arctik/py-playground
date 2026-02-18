@@ -1,6 +1,6 @@
 # Flow: Turtle Simulations
 
-**Last Updated:** 2026-02-17
+**Last Updated:** 2026-02-18
 **Status:** Active
 
 ---
@@ -438,10 +438,10 @@ basthon.kernel.display_event({ "display_type": "turtle", "content": svg_dict })
 - File: `index.html:30-74`
 - Styling: `assets/style.css:1-366` (dark theme with teal accent for turtle cards)
 
-**Pygame Simulations (9/11 Live):**
-- 9 simple/medium pygame sims are live using PyScript 2025.3.1 + pygame-ce + HTML5 canvas
+**Pygame Simulations (11/11 Live):**
+- All 11 pygame sims are live using PyScript 2025.3.1 + pygame-ce + HTML5 canvas
 - Shared player page: `pygame/index.html` (same `?sim=` URL param pattern as turtle)
-- 2 complex sims (First Game, Minesweeper) are marked "Coming Soon" on landing page
+- First Game and Minesweeper are fully deployed; no "Coming Soon" cards remain on the landing page
 - Planning doc: `docs/planning/pygame-projects.md`
 
 **Local Development/Testing:**
