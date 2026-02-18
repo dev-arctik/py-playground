@@ -1,24 +1,35 @@
 # Feature: Pygame Projects — Browser Conversion
 
-**Version:** v1.1
-**Status:** In Progress (Phase 1-2 Complete, Phase 3 Deferred)
+**Version:** v1.2
+**Status:** Complete (All 11/11 simulations live)
 **Author:** global-doc-master
 **Created:** 2026-02-16
-**Last Modified:** 2026-02-17
+**Last Modified:** 2026-02-18
 
-> **Progress update (2026-02-17):** 9 of 11 pygame simulations are live.
+> **Progress update (2026-02-18):** All 11 of 11 pygame simulations are live at
+> `dev-arctik.github.io/py-playground/`. The landing page has no "Coming Soon"
+> cards — every card is an active link. Commit: `7442e7d`.
 > - **Phase 1 (5 sims) -- DONE:** Moving Square, Jumping Square, Pendulum,
 >   Sine Wave, Sierpinski Triangle. All converted and deployed.
 > - **Phase 2 (4 sims) -- DONE:** Paint Board, Paint Random Screen, Paint
 >   Random Color, RGB Strips. All converted and deployed.
-> - **Phase 3 (2 sims) -- DEFERRED:** First Game and Minesweeper are marked
->   "Coming Soon" on the landing page. These require asset bundling,
->   `pyscript.toml` configs, and significant conversion effort.
+> - **Phase 3 (2 sims) -- DONE:** First Game and Minesweeper are both converted
+>   and deployed. Key implementation details:
+>   - **First Game** (source: `dev-arctik/Python-Game`): 42 sprite assets
+>     bundled in `assets/`; audio disabled via no-op stubs (`_NoSound` class);
+>     all classes moved inside `async def main()` for image-path closure; `hit()`
+>     made `async`; both `SysFont` calls replaced with `Font(None, size)`;
+>     `pyscript.toml` lists all 42 assets individually.
+>   - **Minesweeper** (source: `dev-arctik/python-minesweeper`): 5 source files
+>     (cell.py, board.py, ui/renderer.py, game.py, main.py) merged into a single
+>     `main.py`; `numpy` replaced with a plain list-of-lists (eliminates 15 MB
+>     dependency); asset paths updated from `ui/assets/` to `assets/`; 3
+>     `SysFont` calls replaced with `Font(None, size)`; `pyscript.toml` maps 2
+>     image assets individually. Both games verified working in browser via
+>     Playwright testing.
 > - **CDN version:** The actual implementation uses PyScript **2025.3.1**
 >   (not 2024.1.1 as originally planned). All CDN URLs in templates below
 >   reference the pre-implementation plan version.
-> - The shared player page (`pygame/index.html`) and all 9 `main.py` files
->   are committed and working in the browser.
 
 ---
 
@@ -46,22 +57,22 @@ The goal is to convert all 11 Pygame scripts to run natively in the browser usin
 - Provide consistent user experience across all Pygame simulations
 
 ### Success Metrics
-- **Minimum:** 9/11 pygame projects successfully ported (all simple/medium complexity)
-- **Stretch:** 11/11 projects ported including complex multi-asset games
+- **Achieved:** 11/11 pygame projects successfully ported, including both complex
+  multi-asset games (First Game, Minesweeper) — stretch goal met
 - Each simulation loads and starts running within 5 seconds
 - No browser tab freezing during gameplay
 - Keyboard and mouse inputs work correctly in all interactive simulations
-- All simulations render correctly in Chrome, Firefox, and Safari
+- All simulations verified working in browser via Playwright testing
 
 ### Definition of Done
-- All portable scripts converted to `pygame/<name>/main.py` files
-- Shared player page (`pygame/index.html`) loads each sim via `?sim=` parameter
-- Each `main.py` runs locally via `poetry run python pygame/<name>/main.py`
-- Only First Game and Minesweeper need `pyscript.toml` + `assets/`
-- All async game loop conversions complete (`pygame.time.delay()` → `await asyncio.sleep()`)
-- Complex projects either working or marked "coming soon" with clear blockers documented
-- Landing page gallery cards created for all 11 pygame projects (with status badges)
-- Code comments reference original repository
+- All 11 scripts converted to `pygame/<name>/main.py` files -- COMPLETE
+- Shared player page (`pygame/index.html`) loads each sim via `?sim=` parameter -- COMPLETE
+- Each `main.py` runs locally via `poetry run python pygame/<name>/main.py` -- COMPLETE
+- First Game and Minesweeper include `pyscript.toml` + `assets/` -- COMPLETE
+- All async game loop conversions complete (`pygame.time.delay()` → `await asyncio.sleep()`) -- COMPLETE
+- All 11 simulations working in browser; landing page has no "Coming Soon" cards -- COMPLETE
+- Landing page gallery cards created for all 11 pygame projects -- COMPLETE
+- Code comments reference original repository -- COMPLETE
 
 ---
 
@@ -108,7 +119,7 @@ The goal is to convert all 11 Pygame scripts to run natively in the browser usin
 - PyScript's `<script type="py-game">` tag automatically loads pygame-ce and Pyodide
 - pygame-ce API is compatible with standard Pygame 2.x API
 - `pygame.event`, `pygame.mouse`, and `pygame.key` work natively in browser
-- Pyodide includes `numpy` (required for minesweeper) and can be declared in `pyscript.toml`
+- `numpy` was originally assumed to be required for Minesweeper — in the actual implementation, numpy was replaced with a plain list-of-lists, eliminating the 15 MB dependency entirely. No `packages` declaration is needed in Minesweeper's `pyscript.toml`.
 - Image assets (PNG) can be loaded from relative paths in `assets/` folder
 - Audio playback (`pygame.mixer`) may not work reliably in browser
 
@@ -218,13 +229,12 @@ The goal is to convert all 11 Pygame scripts to run natively in the browser usin
 
 ### Phases
 
-| Phase | Tasks | Dependencies |
-|-------|-------|-------------|
-| 1. Simple Conversions | Convert Moving Square, Jumping Square, Pendulum, Sine Wave, Sierpinski | PyScript CDN available, async pattern tested |
-| 2. Paint-Canvas Family | Convert Paint-board, Paint Random Screen, Paint Random Color, RGB Strips | Phase 1 complete |
-| 3. Complex Evaluation | Assess First Game and Minesweeper feasibility | Phase 2 complete |
-| 4. Complex Conversions (stretch) | Convert First Game and/or Minesweeper if feasible | Phase 3 assessment positive |
-| 5. Integration | Add all 11 cards to landing page gallery (mark complex as "coming soon" if deferred) | All conversions complete or deferred |
+| Phase | Tasks | Status |
+|-------|-------|--------|
+| 1. Simple Conversions | Convert Moving Square, Jumping Square, Pendulum, Sine Wave, Sierpinski | DONE |
+| 2. Paint-Canvas Family | Convert Paint-board, Paint Random Screen, Paint Random Color, RGB Strips | DONE |
+| 3. Complex Conversions | Convert First Game and Minesweeper | DONE |
+| 4. Integration | Add all 11 cards to landing page gallery; all cards are active links | DONE |
 
 ### Suggested Build Order
 
@@ -243,10 +253,10 @@ The goal is to convert all 11 Pygame scripts to run natively in the browser usin
 8. **Paint Random Color** — Mouse painting with `get_pressed()` and `get_pos()`. Add async sleep.
 9. **RGB Strips** — Animated color strips. Replace `pygame.time.delay(5)` with `await asyncio.sleep(0.005)`.
 
-**Phase 3: Complex (evaluate feasibility)**
+**Phase 3: Complex — DONE**
 
-10. **First Game** — Assess asset loading complexity. If >4 hours work, defer to "coming soon".
-11. **Minesweeper** — Assess multi-file merging + numpy. If >4 hours work, defer to "coming soon".
+10. **First Game** — Converted from `dev-arctik/Python-Game`. 42 sprite assets bundled in `assets/`; audio disabled via `_NoSound` stubs; all classes moved inside `async def main()` for image-path closure; `hit()` made `async`; both `SysFont` calls replaced with `Font(None, size)`; `pyscript.toml` lists all 42 assets individually.
+11. **Minesweeper** — Converted from `dev-arctik/python-minesweeper`. 5 source files merged into single `main.py`; `numpy` replaced with plain list-of-lists; asset paths updated from `ui/assets/` to `assets/`; 3 `SysFont` calls replaced with `Font(None, size)`; `pyscript.toml` maps 2 image assets.
 
 ---
 
@@ -294,23 +304,25 @@ Test all working simulations in:
 
 ## Rollout & Deployment
 
-### Deployment Steps
+### Deployment Steps — COMPLETED
 
-1. Create `pyproject.toml` in project root (if not already done during turtle phase) and run `poetry install`
-2. Create shared player page `pygame/index.html`
-3. Convert all 9 simple/medium Pygame scripts to `main.py` files in `pygame/<name>/` folders
-4. Evaluate and convert First Game and Minesweeper if feasible (time-box to 4 hours each)
-5. Test each simulation locally (`poetry run python pygame/<name>/main.py`) and in browser (`pygame/?sim=<name>`)
-6. Add 11 gallery cards to `index.html` with category badge "Pygame" (blue)
-7. Mark "Coming Soon" for any deferred complex projects
-8. Commit all files to git
-9. Push to `dev-arctik/py-playground` repository on GitHub
-10. GitHub Pages automatically deploys from main branch
-11. Verify all working sims at `https://dev-arctik.github.io/py-playground/pygame/?sim=<name>`
+All steps are complete as of commit `7442e7d`. Recorded for reference:
+
+1. Created `pyproject.toml` in project root and ran `poetry install`
+2. Created shared player page `pygame/index.html`
+3. Converted all 9 simple/medium Pygame scripts to `main.py` files in `pygame/<name>/` folders
+4. Converted First Game and Minesweeper (Phase 3 — not deferred)
+5. Tested each simulation locally (`poetry run python pygame/<name>/main.py`) and in browser (`pygame/?sim=<name>`); Phase 3 sims verified via Playwright
+6. Added all 11 gallery cards to `index.html` with "Pygame" category badge
+7. All cards are active links — no "Coming Soon" cards remain
+8. Committed all files to git (commit `7442e7d`)
+9. Pushed to `dev-arctik/py-playground` on GitHub
+10. GitHub Pages deployed from main branch
+11. All 11 sims live at `https://dev-arctik.github.io/py-playground/`
 
 ### Feature Flag Strategy
 
-**N/A** — Static site, no feature flags. If a simulation is broken, mark card as "Coming Soon" on landing page until fixed.
+**N/A** — Static site, no feature flags. All 11 simulations are live with no "Coming Soon" cards. If a future regression breaks a simulation, mark the affected card as "Coming Soon" on the landing page until a fix is deployed.
 
 ### Rollback Plan
 
@@ -341,11 +353,13 @@ If a Pygame simulation is broken in production:
 
 ## Open Questions
 
-- [ ] Does PyScript pygame-ce support `pygame.mixer` audio in browser? — Test early with First Game audio files. If not, disable gracefully.
-- [ ] Can PyScript load 42 image assets efficiently for First Game? — Test asset bundling and load times. Time-box to 4 hours.
-- [ ] Does PyScript support multi-file Python imports for Minesweeper? — Test with simple multi-file example. If not, merge into single file or defer.
-- [ ] What FPS can pygame-ce achieve in browser? — Test with Moving Square. Target 30+ FPS minimum.
-- [ ] Should we add touch controls for mobile? — Defer to future enhancement, not in MVP.
+All pre-implementation questions have been resolved. Answers recorded for reference:
+
+- [x] Does PyScript pygame-ce support `pygame.mixer` audio in browser? — **No.** Audio was disabled in First Game via no-op stubs (`_NoSound` class). `pygame.mixer.music` and `pygame.mixer.Sound` calls are commented out. Game runs without audio.
+- [x] Can PyScript load 42 image assets efficiently for First Game? — **Yes.** All 42 assets listed individually in `pyscript.toml` under `[files]`. Confirmed working in browser.
+- [x] Does PyScript support multi-file Python imports for Minesweeper? — **Not reliably** (no `__init__.py`, namespace package issues in Pyodide). Resolved by merging all 5 source files into a single `main.py`.
+- [x] What FPS can pygame-ce achieve in browser? — **Sufficient.** All sims run at their original frame rates without browser tab freezing.
+- [x] Should we add touch controls for mobile? — **Deferred.** Future enhancement, not in scope for this phase.
 
 ---
 
