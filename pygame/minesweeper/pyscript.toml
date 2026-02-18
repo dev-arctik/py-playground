@@ -1,0 +1,6 @@
+# Minesweeper — PyScript config for asset loading
+# numpy removed: Board uses plain lists instead
+
+[files]
+"./assets/bomb.png" = "./assets/bomb.png"
+"./assets/flag.png" = "./assets/flag.png"

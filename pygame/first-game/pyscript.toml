@@ -1,0 +1,52 @@
+# First Game — PyScript config for asset loading
+# No packages needed (audio disabled, no numpy)
+# Each image listed individually (static hosting has no directory listing)
+
+[files]
+# Player walk right (9 frames)
+"./assets/R1.png" = "./assets/R1.png"
+"./assets/R2.png" = "./assets/R2.png"
+"./assets/R3.png" = "./assets/R3.png"
+"./assets/R4.png" = "./assets/R4.png"
+"./assets/R5.png" = "./assets/R5.png"
+"./assets/R6.png" = "./assets/R6.png"
+"./assets/R7.png" = "./assets/R7.png"
+"./assets/R8.png" = "./assets/R8.png"
+"./assets/R9.png" = "./assets/R9.png"
+# Player walk left (9 frames)
+"./assets/L1.png" = "./assets/L1.png"
+"./assets/L2.png" = "./assets/L2.png"
+"./assets/L3.png" = "./assets/L3.png"
+"./assets/L4.png" = "./assets/L4.png"
+"./assets/L5.png" = "./assets/L5.png"
+"./assets/L6.png" = "./assets/L6.png"
+"./assets/L7.png" = "./assets/L7.png"
+"./assets/L8.png" = "./assets/L8.png"
+"./assets/L9.png" = "./assets/L9.png"
+# Enemy walk right (11 frames)
+"./assets/R1E.png" = "./assets/R1E.png"
+"./assets/R2E.png" = "./assets/R2E.png"
+"./assets/R3E.png" = "./assets/R3E.png"
+"./assets/R4E.png" = "./assets/R4E.png"
+"./assets/R5E.png" = "./assets/R5E.png"
+"./assets/R6E.png" = "./assets/R6E.png"
+"./assets/R7E.png" = "./assets/R7E.png"
+"./assets/R8E.png" = "./assets/R8E.png"
+"./assets/R9E.png" = "./assets/R9E.png"
+"./assets/R10E.png" = "./assets/R10E.png"
+"./assets/R11E.png" = "./assets/R11E.png"
+# Enemy walk left (11 frames)
+"./assets/L1E.png" = "./assets/L1E.png"
+"./assets/L2E.png" = "./assets/L2E.png"
+"./assets/L3E.png" = "./assets/L3E.png"
+"./assets/L4E.png" = "./assets/L4E.png"
+"./assets/L5E.png" = "./assets/L5E.png"
+"./assets/L6E.png" = "./assets/L6E.png"
+"./assets/L7E.png" = "./assets/L7E.png"
+"./assets/L8E.png" = "./assets/L8E.png"
+"./assets/L9E.png" = "./assets/L9E.png"
+"./assets/L10E.png" = "./assets/L10E.png"
+"./assets/L11E.png" = "./assets/L11E.png"
+# Background and standing character
+"./assets/bg.jpg" = "./assets/bg.jpg"
+"./assets/standing.png" = "./assets/standing.png"
